@@ -101,11 +101,6 @@ public class Perceptron
 
     public void SetWeights(float[] newWeights)
     {
-        if (newWeights.Length != inputs.Count)
-        {
-            throw new System.Exception("\n num of weights =/= num of inputs \n");
-        }
-
         for (int i = 0; i < newWeights.Length; i++)
         {
             inputs[i].weight = newWeights[i];  

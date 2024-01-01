@@ -77,13 +77,6 @@ public class MLPNetwork : MonoBehaviour
             perceptron.FeedForward();
 
     }
-    //deprecated: used for predict, too expensive
-    /*public MLPNetwork Clone()
-    {
-        MLPNetwork clone = new MLPNetwork();
-        clone.InitializeNetwork(this.GetWeights());
-        return clone;
-    }*/
 
     public float[] Predict(float[] inputs)
     {
@@ -105,22 +98,13 @@ public class MLPNetwork : MonoBehaviour
 
     public void QLearningUpdate(float[] currentState, float[] newState, float reward, int actionTaken)
     {
-        // Predict the current Q-values for all actions
         float[] currentQValues = Predict(currentState);
-
-        // Predict the future Q-values for all actions in the new state
         float[] futureQValues = Predict(newState);
-
-        // Calculate the max future Q-value (for Bellman equation)
         float maxFutureQ = futureQValues.Max();
-
-        // Calculate the TD-error (Temporal Difference Error) only for the action taken
         float tdError = (reward + discountFactor * maxFutureQ) - currentQValues[actionTaken];
 
-        // Update the weights for only the output perceptron associated with the action taken
         outputPerceptrons[actionTaken].AdjustWeight(tdError);
 
-        // Propagate the error back to hidden layers
         for (int i = 0; i < hiddenPerceptrons.Count; i++)
         {
             Perceptron hiddenPerceptron = hiddenPerceptrons[i];

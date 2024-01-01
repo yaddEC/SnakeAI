@@ -10,9 +10,6 @@ public class GameManager : MonoBehaviour
 {
     List<Snake>snakes = new List<Snake>();
 
-    /*[SerializeField]
-    //for testing snake
-    Snake playerTest;*/
     [SerializeField]
     int populationSize = 20;
 
@@ -31,7 +28,7 @@ public class GameManager : MonoBehaviour
     TMP_Text highestScoreText;
     [SerializeField]
     TMP_Text generationText;
-
+    public int minimumScoreVisible = 0;
     public int PreviousHighestScore = 0;
     public int HighestScore = 0;
     public int Generation = 1;
@@ -45,7 +42,7 @@ public class GameManager : MonoBehaviour
     private float mutationAmount = 0.01f;
     private List<float[]> newWeights;
 
-    // Start is called before the first frame update
+
     void Start()
     {
         LoadPopulationData();
@@ -56,35 +53,27 @@ public class GameManager : MonoBehaviour
         {
             GameObject newSnakeGameObject = Instantiate(snakePrefab);
             Snake newSnake = newSnakeGameObject.GetComponent<Snake>(); 
-            newSnake.Initialize(null); // start with random weights
+            newSnake.Initialize(null); 
             snakes.Add(newSnake);
         }
     }
 
-    // Update is called once per frame
+
     void Update()
     {
         limitTimer += Time.deltaTime;
         timer += Time.deltaTime;
-        //getInput();//for testing snake
         if (timer < 1/snakeSpeed) return;
         timer = 0f;
         if (AllSnakesDead() || limitTimer > timeLimitInSeconds)
         {
-            /*if(HighestScore>= PreviousHighestScore)
-            {*/
-                SavePopulationData(snakes, HighestScore, Generation);
-                EvolvePopulation();
-                PreviousHighestScore = HighestScore;
 
-            /*}
-            else 
-            {
-                ResetSnakes();
-            }*/
-            limitTimer = 0f;
-            HighestScore = 0;
-            Generation++;
+           SavePopulationData(snakes, HighestScore, Generation);
+           EvolvePopulation();
+           PreviousHighestScore = HighestScore;
+           limitTimer = 0f;
+           HighestScore = 0;
+           Generation++;
 
         }
         else
@@ -92,7 +81,7 @@ public class GameManager : MonoBehaviour
             foreach (var snake in snakes)
             {
                 snake.Iterate();
-                if (snake.score < 5)
+                if (snake.score < minimumScoreVisible)
                     snake.Hide();
 
                 if (snake.score>HighestScore) 
@@ -100,7 +89,7 @@ public class GameManager : MonoBehaviour
             }
         }
 
-        //playerTest.Move();//for testing snake
+
         UpdateUI();
     }
 
@@ -114,7 +103,7 @@ public class GameManager : MonoBehaviour
     void EvolvePopulation()
     {
 
-        int numberToSelect = Mathf.Max(2, snakes.Count / 5);//best 20%
+        int numberToSelect = Mathf.Max(2, snakes.Count / 5);
 
         List<Snake> selectedForBreeding = SelectBestSnakes(snakes, numberToSelect);
 
@@ -157,7 +146,6 @@ public class GameManager : MonoBehaviour
             float[] parent1Weights = parent1.GetWeights();
             float[] parent2Weights = parent2.GetWeights();
 
-            // Crossover: Create a child by combining parts of each parent's weights
             float[] childWeights = new float[parent1Weights.Length];
             int crossoverPoint = UnityEngine.Random.Range(0, childWeights.Length); 
             for (int j = 0; j < childWeights.Length; j++)
@@ -165,7 +153,6 @@ public class GameManager : MonoBehaviour
                 childWeights[j] = j < crossoverPoint ? parent1Weights[j] : parent2Weights[j];
             }
 
-            // Mutation: Slightly randomize the child's weights to introduce variation
             for (int j = 0; j < childWeights.Length; j++)
             {
                 if (UnityEngine.Random.Range(0f, 1f) < mutationRate)
@@ -245,29 +232,5 @@ public class GameManager : MonoBehaviour
         }
     }
 
-    /*void getInput()
-    {
-        if ( UnityEngine.Input.GetKeyDown(KeyCode.UpArrow))
-        {
-            if (playerTest.moveDir != new Vector2(0, -1)) 
-                playerTest.ChangeDirection(new Vector2(0, 1)); 
-        }
-        else if (UnityEngine.Input.GetKeyDown(KeyCode.RightArrow))
-        {
-            if (playerTest.moveDir != new Vector2(-1, 0))
-                playerTest.ChangeDirection(new Vector2(1, 0));
-        }
-       
-        else if (UnityEngine.Input.GetKeyDown(KeyCode.LeftArrow))
-        {
-            if (playerTest.moveDir != new Vector2(1, 0))
-                playerTest.ChangeDirection(new Vector2(-1, 0));
-        }
-        else if (UnityEngine.Input.GetKeyDown(KeyCode.DownArrow))
-        {
-            if (playerTest.moveDir != new Vector2(0, 1))
-                playerTest.ChangeDirection(new Vector2(0, -1));
-        }
-    }*/
 }
 
